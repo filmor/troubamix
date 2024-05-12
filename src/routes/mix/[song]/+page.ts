@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { songs } from "$lib/data.ts";
+import { songs } from "$lib/data.js";
 
 export async function load({ fetch, params }) {
     const song = songs.find((song) => params.song == song.name)
@@ -7,19 +7,12 @@ export async function load({ fetch, params }) {
     if (!song)
         throw error(404);
 
-    const trackData = await Promise.all(song.tracks.map(async (track) => {
-        const url = `/${song.name}/${track.file}`;
+    await Promise.all(song.tracks.map(async (track) => {
+        const url = `/${song.name}/${track.filename}`;
         const resp = await fetch(url);
         const buf = await resp.arrayBuffer();
-        return buf;
+        track.data = buf;
     }));
-
-    console.log(trackData);
-
-    for (const i in song.tracks) {
-        const t = song.tracks[i];
-        t.data = trackData[i];
-    }
 
     return { song };
 }

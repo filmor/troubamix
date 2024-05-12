@@ -1,6 +1,6 @@
-import type { Song, Track } from "./song";
+import type Song from "./song";
 
-export const songs: [Song] = [
+export const songs: Song[] = [
   {
     name: "owner",
     long_name: "Owner of a lonely heart",
@@ -9,12 +9,12 @@ export const songs: [Song] = [
       {
         id: "sop",
         name: "Sopran",
-        file: "owner-sop.mp3"
+        filename: "owner-sop.mp3"
       },
       {
         id: "bass",
         name: "Bass",
-        file: "owner-bass.mp3"
+        filename: "owner-bass.mp3"
       },
     ]
   }

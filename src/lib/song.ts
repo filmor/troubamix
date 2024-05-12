@@ -1,11 +1,8 @@
-export interface Track {
-    name: string,
-    filename: string,
-}
+import type Track from "./track";
 
-export interface Song {
-    name: string,
-    long_name: string,
-    score_file: string,
-    tracks: [Track]
-};
+export default interface Song {
+    name: string;
+    long_name: string;
+    score_file: string;
+    tracks: Track[];
+}
