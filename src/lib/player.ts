@@ -41,8 +41,8 @@ class TrackState {
 }
 
 export default class Player {
-  // schedule offset in milliseconds
-  static SCHED_OFFSET = 50;
+  // schedule offset in seconds
+  static SCHED_OFFSET = 0.050;
 
   playing = false;
   lastStart = -1;
@@ -55,20 +55,16 @@ export default class Player {
     song: Song,
   ): Promise<Player> {
     const buffers = new Map<string, AudioBuffer>();
-    await Promise.all(
-      (function* () {
-        for (const [id, track] of song.tracks.entries()) {
-          yield async () => {
-            const url = `/${song.name}/${track.filename}`;
-            const resp = await fetch(url);
-            const buf = await resp.arrayBuffer();
-            const decoded = await context.decodeAudioData(buf);
+    const promises = Object.entries(song.tracks).map(async ([id, track]) => {
+      const url = `/${song.name}/${track.filename}`;
+      const resp = await fetch(url);
+      const buf = await resp.arrayBuffer();
+      const decoded = await context.decodeAudioData(buf);
 
-            buffers.set(id, decoded);
-          };
-        }
-      })(),
-    );
+      buffers.set(id, decoded);
+    });
+
+    await Promise.all(promises);
 
     return new Player(context, song, buffers);
   }

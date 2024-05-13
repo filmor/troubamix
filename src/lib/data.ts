@@ -5,19 +5,17 @@ export const songs: Song[] = [
     name: "owner",
     long_name: "Owner of a lonely heart",
     score_file: "owner.pdf",
-    tracks: new Map(
-      Object.entries({
-        sop: {
-          id: "sop",
-          name: "Sopran",
-          filename: "owner-sop.mp3",
-        },
-        bass: {
-          id: "bass",
-          name: "Bass",
-          filename: "owner-bass.mp3",
-        },
-      }),
-    ),
+    tracks: {
+      sop: {
+        id: "sop",
+        name: "Sopran",
+        filename: "owner-sop.mp3",
+      },
+      bass: {
+        id: "bass",
+        name: "Bass",
+        filename: "owner-bass.mp3",
+      },
+    },
   },
 ];
