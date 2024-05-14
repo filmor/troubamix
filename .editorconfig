@@ -1,2 +1,2 @@
-[*{js,svelte,html,ts,json}]
+[*.{js,svelte,html,ts,json}]
 indent_size = 2

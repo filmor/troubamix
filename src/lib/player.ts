@@ -1,67 +1,28 @@
+import { TrackState } from "./track_state";
 import type Song from "./song";
-
-class TrackState {
-  public playing = false;
-  public gain: GainNode;
-  public pan: StereoPannerNode;
-  context: BaseAudioContext;
-  source: AudioBufferSourceNode;
-
-  constructor(
-    private output: AudioNode,
-    private buffer: AudioBuffer,
-  ) {
-    this.context = output.context;
-
-    this.gain = this.context.createGain();
-    this.pan = this.context.createStereoPanner();
-    this.source = this.context.createBufferSource();
-
-    this.gain.connect(this.pan).connect(this.output);
-  }
-
-  reset() {
-    this.source = this.context.createBufferSource();
-    this.source.buffer = this.buffer;
-    this.source.connect(this.gain);
-  }
-
-  public play(when: number, offset: number): void {
-    this.reset();
-    this.source.start(when, offset);
-    this.playing = true;
-  }
-
-  public stop(when: number): void {
-    if (this.playing) {
-      this.source.stop(when);
-      this.playing = false;
-    }
-  }
-}
 
 export default class Player {
   // schedule offset in seconds
-  static SCHED_OFFSET = 0.050;
+  static SCHED_OFFSET = 0.01;
 
   playing = false;
   lastStart = -1;
   position = 0.0;
   gain: GainNode;
-  public states = new Map<string, TrackState>();
+  public states: Record<string, TrackState> = {};
 
   public static async create(
     context: AudioContext,
     song: Song,
   ): Promise<Player> {
-    const buffers = new Map<string, AudioBuffer>();
+    const buffers: Record<string, AudioBuffer> = {};
     const promises = Object.entries(song.tracks).map(async ([id, track]) => {
       const url = `/${song.name}/${track.filename}`;
       const resp = await fetch(url);
       const buf = await resp.arrayBuffer();
       const decoded = await context.decodeAudioData(buf);
 
-      buffers.set(id, decoded);
+      buffers[id] = decoded;
     });
 
     await Promise.all(promises);
@@ -72,13 +33,12 @@ export default class Player {
   constructor(
     private readonly context: AudioContext,
     private readonly song: Song,
-    readonly buffers: Map<string, AudioBuffer>,
+    readonly buffers: Record<string, AudioBuffer>,
   ) {
     this.gain = this.context.createGain();
     this.gain.connect(context.destination);
     for (const id in this.song.tracks) {
-      const st = new TrackState(this.gain, buffers.get(id)!);
-      this.states.set(id, st);
+      this.states[id] = new TrackState(this.gain, buffers[id]);
     }
   }
 
@@ -89,7 +49,7 @@ export default class Player {
 
     const startTime = this.context.currentTime + Player.SCHED_OFFSET;
 
-    for (const st of this.states.values()) {
+    for (const st of Object.values(this.states)) {
       st.play(startTime, offset + this.position);
     }
 
@@ -100,16 +60,24 @@ export default class Player {
   public pause(): void {
     const stopTime = this.context.currentTime + Player.SCHED_OFFSET;
 
-    for (const st of this.states.values()) {
+    for (const st of Object.values(this.states)) {
       st.stop(stopTime);
     }
 
     this.playing = false;
-    this.position += stopTime - this.lastStart;
+    this.position += stopTime - this.lastStart - Player.SCHED_OFFSET;
   }
 
   public stop(): void {
     this.pause();
     this.position = 0.0;
+  }
+
+  public toggle(): void {
+    if (this.playing) {
+      this.pause();
+    } else {
+      this.play();
+    }
   }
 }

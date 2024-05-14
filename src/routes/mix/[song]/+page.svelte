@@ -1,18 +1,30 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Player from "$lib/player.js";
+  import Sliders from "./Sliders.svelte";
+  import PlayerControls from "./PlayerControls.svelte";
 
   export let data;
+
   $: song = data.song;
+  let player: Player;
 
   onMount(async () => {
     const ctx = new window.AudioContext();
-    const player = await Player.create(ctx, song);
-
+    player = await Player.create(ctx, song);
     window.player = player;
   });
 </script>
 
-<h1>Mix {song.long_name}</h1>
+<h2 class="font-bold text-xl">Mix {song.long_name}</h2>
 
-<button on:click={window.player ? window.player.play() : null}>Play</button>
+<div class="flex-col">
+  {#if player}
+    <PlayerControls {player} />
+    {#each Object.entries(song.tracks) as [id, track]}
+      <Sliders {track} state={player.states[id]} />
+    {/each}
+  {:else}
+    Loading ...
+  {/if}
+</div>
