@@ -19,7 +19,7 @@
   }
 </script>
 
-<span class="inline-flex overflow-hidden rounded-lg border bg-white shadow-sm">
+<div class="inline-flex overflow-hidden rounded-lg border bg-white shadow-sm">
   <button
     class="inline-block border-e p-3 hover:bg-gray-200 focus:relative"
     on:click={togglePlayer}
@@ -78,4 +78,4 @@
       />
     </svg>
   </button>
-</span>
+</div>

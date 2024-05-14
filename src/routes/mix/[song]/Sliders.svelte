@@ -4,7 +4,7 @@
   export let state: TrackState;
 </script>
 
-<div class="flex-col w-20">
+<div class="flex flex-col w-20">
   <h3 class="font-bold text-lg">{track.name}</h3>
   <!-- pan -->
   <input type="range" class="w-16" bind:value={state.pan} />
