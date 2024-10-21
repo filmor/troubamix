@@ -1,0 +1,31 @@
+{
+  "name": "pdm",
+  "long_name": "",
+  "score": "pdf",
+  "tracks": [
+    {
+      "id": "sop",
+      "name": "Sopran"
+    },
+    {
+      "id": "alt1",
+      "name": "Alt 1"
+    },
+    {
+      "id": "alt2",
+      "name": "Alt 2"
+    },
+    {
+      "id": "tenor",
+      "name": "Tenor"
+    },
+    {
+      "id": "bass",
+      "name": "Bass"
+    },
+    {
+      "id": "backing",
+      "name": "Backing"
+    }
+  ]
+}
