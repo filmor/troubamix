@@ -26,6 +26,6 @@
   },
   "type": "module",
   "dependencies": {
-    "svelte-pdfjs": "^0.8.0"
+    "svelte-pdfjs": "^0.9.0"
   }
 }
