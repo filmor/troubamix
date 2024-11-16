@@ -1,6 +1,6 @@
 import type Track from "./track";
 
-export default interface Song {
+export interface Song {
   name: string;
   long_name: string;
   score?: string;

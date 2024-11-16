@@ -1,18 +1,18 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import Player from "$lib/player.js";
+  import { Player } from "$lib/player";
   import Sliders from "./Sliders.svelte";
   import PlayerControls from "./PlayerControls.svelte";
+  import type { Song } from "$lib/song";
 
-  export let data;
-
-  $: song = data.song;
-  let player: Player;
+  let props: {data: Song} = $props();
+  let song: Song = $derived(props.data);
+  let player: Player = $state() as Player;
 
   onMount(async () => {
     const ctx = new window.AudioContext();
     player = await Player.create(ctx, song);
-    window.player = player;
+    // window.player = player;
   });
 </script>
 

@@ -1,7 +1,7 @@
 import { TrackState } from "./track_state";
-import type Song from "./song";
+import type { Song } from "./song";
 
-export default class Player {
+export class Player {
   // schedule offset in seconds
   static SCHED_OFFSET = 0.01;
 

@@ -1,8 +1,13 @@
 <script lang="ts">
-  import Player from "$lib/player.js";
+  import { Player } from "$lib/player.js";
 
-  export let playing: boolean = false;
-  export let player: Player;
+  type Props = {
+    player: Player
+  };
+
+  let { player }: Props = $props();
+
+  let playing: boolean = $state(false);
 
   function togglePlayer() {
     if (player) {
@@ -22,7 +27,7 @@
 <div class="inline-flex overflow-hidden rounded-lg border bg-white shadow-sm">
   <button
     class="inline-block border-e p-3 hover:bg-gray-200 focus:relative"
-    on:click={togglePlayer}
+    onclick={togglePlayer}
   >
     {#if playing}
       <svg
@@ -60,7 +65,7 @@
   </button>
   <button
     class="inline-block border-e p-3 hover:bg-gray-200 focus:relative"
-    on:click={stopPlayer}
+    onclick={stopPlayer}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

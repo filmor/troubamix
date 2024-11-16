@@ -1,7 +1,10 @@
 <script lang="ts">
+  import type { Track } from "$lib/track";
   import { TrackState } from "$lib/track_state";
-  export let track;
-  export let state: TrackState;
+
+  type Props = { track: Track, state: TrackState };
+
+  let { track, state }: Props = $props();
 </script>
 
 <div class="flex flex-col w-20">
