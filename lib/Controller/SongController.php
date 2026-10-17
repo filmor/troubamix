@@ -104,8 +104,8 @@ class SongController extends Controller {
 		return $this->rootFolder->getUserFolder($user->getUID());
 	}
 
-	private function getSongFolder(int $folderId): ?Folder {
-		if ($folderId < 1) {
+	private function getSongFolder(int $fileId): ?Folder {
+		if ($fileId < 1) {
 			return null;
 		}
 
@@ -114,9 +114,16 @@ class SongController extends Controller {
 			return null;
 		}
 
-		foreach ($userFolder->getById($folderId) as $node) {
+		foreach ($userFolder->getById($fileId) as $node) {
 			if ($node instanceof Folder && $node->nodeExists(self::MARKER_FILE)) {
 				return $node;
+			}
+
+			if ($node instanceof File && $node->getName() === self::MARKER_FILE) {
+				$parent = $node->getParent();
+				if ($parent instanceof Folder && $parent->nodeExists(self::MARKER_FILE)) {
+					return $parent;
+				}
 			}
 		}
 

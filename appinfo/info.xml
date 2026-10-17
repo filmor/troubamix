@@ -8,6 +8,7 @@
 	<licence>agpl</licence>
 	<author>Filmor</author>
 	<namespace>Troubamix</namespace>
+	<bootstrap>OCA\Troubamix\AppInfo\Application</bootstrap>
 	<category>multimedia</category>
 	<dependencies>
 		<nextcloud min-version="28"/>

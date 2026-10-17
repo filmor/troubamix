@@ -30,8 +30,11 @@ To build the Nextcloud frontend, install Node.js 18 or later and pnpm.
    occ app:enable troubamix
    ```
 
-4. Open **Troubamix** from the Nextcloud app navigation. Select a mix, then use
-   the play, pause, and stop controls and the per-track gain and pan sliders.
+4. Open **Troubamix** from the Nextcloud app navigation to browse available
+   mixes, or use the file action **Open with Troubamix** on a `troubamix.json`
+   file in the Files app. The action also works for song folders shared with
+   your account. Use the play, pause, and stop controls and the per-track gain
+   and pan sliders.
 
 The app has no database migrations or per-user settings. It finds song folders
 in the signed-in user's Nextcloud files by searching for a `troubamix.json`
