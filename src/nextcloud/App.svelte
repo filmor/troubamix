@@ -37,14 +37,18 @@
         `${config.songsUrl}/${encodeURIComponent(config.song)}/files`,
       );
     } catch {
-      error = "This mix could not be loaded.";
+      error = config.song
+        ? "This mix could not be loaded."
+        : "Song folders could not be loaded.";
     }
   });
 </script>
 
 {#if config.song}
   {#if song}
-    <h2 class="font-bold text-xl">Mix {song.long_name}</h2>
+    <h2 class="font-bold text-xl">
+      Mix {song.long_name || song.folderName || song.name}
+    </h2>
   {/if}
 
   <div class="flex flex-col rounded-md border">

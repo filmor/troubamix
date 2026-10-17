@@ -115,7 +115,7 @@ class SongController extends Controller {
 		}
 
 		foreach ($userFolder->getById($folderId) as $node) {
-			if ($node instanceof Folder && $this->readMetadata($node) !== null) {
+			if ($node instanceof Folder && $node->nodeExists(self::MARKER_FILE)) {
 				return $node;
 			}
 		}
