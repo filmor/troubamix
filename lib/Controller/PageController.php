@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OCA\Troubamix\Controller;
 
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\Exceptions\NotFoundException;
+use OCP\AppFramework\Http\NotFoundResponse;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\AppFramework\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\IRequest;
 use OCP\Util;
 
@@ -24,9 +24,9 @@ class PageController extends Controller {
 	}
 
 	#[NoAdminRequired]
-	public function mix(string $song): TemplateResponse {
+	public function mix(string $song): TemplateResponse|NotFoundResponse {
 		if (!in_array($song, self::SONGS, true)) {
-			throw new NotFoundException('Song not found');
+			return new NotFoundResponse();
 		}
 
 		return $this->renderPage($song);

@@ -1,38 +1,48 @@
-# create-svelte
+# Troubamix
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Troubamix is a browser-based mixer for the individual vocal tracks of a song.
+It is available as a Nextcloud app and can also be run as the original
+standalone SvelteKit site.
 
-## Creating a project
+## Requirements
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Nextcloud 28 or later
+- PHP 8.1 or later
+- A modern browser with Web Audio API support
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+To build the Nextcloud frontend, install Node.js 18 or later and pnpm.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Install in Nextcloud
 
-## Developing
+1. Install the frontend dependencies and build the app assets:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+   ```sh
+   pnpm install --frozen-lockfile
+   pnpm run build:nextcloud
+   ```
 
-```bash
-npm run dev
+2. Copy the complete `troubamix` directory, including the generated
+   `js/troubamix.js` and `css/troubamix.css`, into Nextcloud's `apps/` directory.
+   The directory name must be `troubamix`.
+3. Enable the app from the Nextcloud app settings or run:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+   ```sh
+   occ app:enable troubamix
+   ```
 
-## Building
+4. Open **Troubamix** from the Nextcloud app navigation. Select a mix, then use
+   the play, pause, and stop controls and the per-track gain and pan sliders.
 
-To create a production version of your app:
+The app has no database migrations or per-user settings. Song metadata and
+audio files are served from the bundled `static/songs/` directory.
 
-```bash
-npm run build
-```
+## Development
 
-You can preview the production build with `npm run preview`.
+Install dependencies with `pnpm install --frozen-lockfile`. Run
+`pnpm run check` to type-check the Svelte project and
+`pnpm run build:nextcloud` to rebuild the assets loaded by Nextcloud. Copy the
+updated generated assets into your local Nextcloud app directory and reload
+Troubamix to test changes.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+The original standalone SvelteKit site remains available with `pnpm run dev`
+and `pnpm run build`.

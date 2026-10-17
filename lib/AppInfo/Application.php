@@ -19,6 +19,7 @@ class Application extends App {
 		$this->getContainer()->get(INavigationManager::class)->add(static function (): array {
 			return [
 				'id' => self::APP_ID,
+				'app' => self::APP_ID,
 				'order' => 10,
 				'href' => Util::linkToRoute(self::APP_ID . '.page.index'),
 				'icon' => Util::imagePath(self::APP_ID, 'app.svg'),

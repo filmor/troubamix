@@ -1,4 +1,4 @@
-import type Track from "./track";
+import type { Track } from "./track";
 
 export interface Song {
   name: string;
