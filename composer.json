@@ -1,0 +1,10 @@
+{
+  "name": "filmor/troubamix",
+  "type": "nextcloud-app",
+  "license": "AGPL-3.0-or-later",
+  "autoload": {
+    "psr-4": {
+      "OCA\\Troubamix\\": "lib/"
+    }
+  }
+}
