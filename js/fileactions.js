@@ -9,15 +9,18 @@
     return;
   }
 
+  var mimeType = "application/x-troubamix";
+  var actionName = "open_troubamix";
+
   window.OCA.Files.fileActions.registerAction({
-    name: "open_troubamix",
+    name: actionName,
     displayName: t("troubamix", "Open with Troubamix"),
-    mime: "application/json",
+    mime: mimeType,
     permissions: window.OC.PERMISSION_READ,
     iconClass: "icon-play",
     actionHandler: function (fileName, context) {
       if (
-        fileName !== "troubamix.json" ||
+        !fileName.toLowerCase().endsWith(".tbmx") ||
         !context ||
         !context.fileList ||
         typeof context.fileList.getModelForFile !== "function"
@@ -42,4 +45,6 @@
       );
     },
   });
+
+  window.OCA.Files.fileActions.setDefault(mimeType, actionName);
 })();

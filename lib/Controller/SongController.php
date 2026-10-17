@@ -16,7 +16,7 @@ use OCP\IRequest;
 use OCP\IUserSession;
 
 class SongController extends Controller {
-	private const MARKER_FILE = 'troubamix.json';
+	private const MARKER_EXTENSION = '.tbmx';
 	private const MAX_METADATA_SIZE = 1048576;
 
 	public function __construct(
@@ -36,19 +36,14 @@ class SongController extends Controller {
 		}
 
 		$songs = [];
-		foreach ($userFolder->search(self::MARKER_FILE) as $marker) {
-			if (!$marker instanceof File || $marker->getName() !== self::MARKER_FILE) {
+		foreach ($userFolder->search('tbmx') as $marker) {
+			if (!$marker instanceof File || !$this->isMarkerFile($marker)) {
 				continue;
 			}
 
-			$folder = $marker->getParent();
-			if (!$folder instanceof Folder) {
-				continue;
-			}
-
-			$metadata = $this->readMetadata($folder);
+			$metadata = $this->readMetadata($marker);
 			if ($metadata !== null) {
-				$songs[] = $this->presentSong($folder, $metadata);
+				$songs[] = $this->presentSong($marker, $metadata);
 			}
 		}
 
@@ -58,17 +53,17 @@ class SongController extends Controller {
 
 	#[NoAdminRequired]
 	public function show(int $folderId): JSONResponse|NotFoundResponse {
-		$folder = $this->getSongFolder($folderId);
-		if ($folder === null) {
+		$marker = $this->getSongMarker($folderId);
+		if ($marker === null) {
 			return new NotFoundResponse();
 		}
 
-		$metadata = $this->readMetadata($folder);
+		$metadata = $this->readMetadata($marker);
 		if ($metadata === null) {
 			return new NotFoundResponse();
 		}
 
-		return new JSONResponse($this->presentSong($folder, $metadata));
+		return new JSONResponse($this->presentSong($marker, $metadata));
 	}
 
 	#[NoAdminRequired]
@@ -77,13 +72,14 @@ class SongController extends Controller {
 			return new NotFoundResponse();
 		}
 
-		$folder = $this->getSongFolder($folderId);
-		if ($folder === null) {
+		$marker = $this->getSongMarker($folderId);
+		if ($marker === null) {
 			return new NotFoundResponse();
 		}
 
-		$metadata = $this->readMetadata($folder);
-		if ($metadata === null || !$this->isTrackFile($metadata, $fileName) || !$folder->nodeExists($fileName)) {
+		$metadata = $this->readMetadata($marker);
+		$folder = $marker->getParent();
+		if ($metadata === null || !$folder instanceof Folder || !$this->isTrackFile($metadata, $fileName) || !$folder->nodeExists($fileName)) {
 			return new NotFoundResponse();
 		}
 
@@ -104,7 +100,7 @@ class SongController extends Controller {
 		return $this->rootFolder->getUserFolder($user->getUID());
 	}
 
-	private function getSongFolder(int $fileId): ?Folder {
+	private function getSongMarker(int $fileId): ?File {
 		if ($fileId < 1) {
 			return null;
 		}
@@ -115,28 +111,16 @@ class SongController extends Controller {
 		}
 
 		foreach ($userFolder->getById($fileId) as $node) {
-			if ($node instanceof Folder && $node->nodeExists(self::MARKER_FILE)) {
+			if ($node instanceof File && $this->isMarkerFile($node) && $this->readMetadata($node) !== null) {
 				return $node;
-			}
-
-			if ($node instanceof File && $node->getName() === self::MARKER_FILE) {
-				$parent = $node->getParent();
-				if ($parent instanceof Folder && $parent->nodeExists(self::MARKER_FILE)) {
-					return $parent;
-				}
 			}
 		}
 
 		return null;
 	}
 
-	private function readMetadata(Folder $folder): ?array {
-		if (!$folder->nodeExists(self::MARKER_FILE)) {
-			return null;
-		}
-
-		$marker = $folder->get(self::MARKER_FILE);
-		if (!$marker instanceof File || !$marker->isReadable() || $marker->getSize() > self::MAX_METADATA_SIZE) {
+	private function readMetadata(File $marker): ?array {
+		if (!$marker->isReadable() || $marker->getSize() > self::MAX_METADATA_SIZE) {
 			return null;
 		}
 
@@ -169,6 +153,10 @@ class SongController extends Controller {
 		return $metadata;
 	}
 
+	private function isMarkerFile(File $file): bool {
+		return str_ends_with(strtolower($file->getName()), self::MARKER_EXTENSION);
+	}
+
 	private function isTrackFile(array $metadata, string $fileName): bool {
 		foreach ($metadata['tracks'] as $track) {
 			if ($fileName === $metadata['name'] . '-' . $track['id'] . '.mp3') {
@@ -179,10 +167,12 @@ class SongController extends Controller {
 		return false;
 	}
 
-	private function presentSong(Folder $folder, array $metadata): array {
+	private function presentSong(File $marker, array $metadata): array {
+		$folder = $marker->getParent();
+
 		return array_merge($metadata, [
-			'id' => (string)$folder->getId(),
-			'folderName' => $folder->getName(),
+			'id' => (string)$marker->getId(),
+			'folderName' => $folder instanceof Folder ? $folder->getName() : '',
 		]);
 	}
 }
