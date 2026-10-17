@@ -33,8 +33,27 @@ To build the Nextcloud frontend, install Node.js 18 or later and pnpm.
 4. Open **Troubamix** from the Nextcloud app navigation. Select a mix, then use
    the play, pause, and stop controls and the per-track gain and pan sliders.
 
-The app has no database migrations or per-user settings. Song metadata and
-audio files are served from the bundled `static/songs/` directory.
+The app has no database migrations or per-user settings. It finds song folders
+in the signed-in user's Nextcloud files by searching for a `troubamix.json`
+marker. The marker contains the song metadata (`name`, `long_name`, and
+`tracks`, with each track containing an `id` and `name`). For example:
+
+```json
+{
+  "name": "owner",
+  "long_name": "Owner of a lonely heart",
+  "tracks": [
+    { "id": "sop", "name": "Soprano" },
+    { "id": "alto", "name": "Alto" }
+  ]
+}
+```
+
+Place the matching MP3 files in the same folder, named
+`{name}-{track-id}.mp3` (for example, `owner-sop.mp3` and `owner-alto.mp3`).
+Troubamix only serves the track files declared by the marker. The app uses
+Nextcloud's file APIs and current-user permissions to discover and stream these
+files.
 
 ## Development
 

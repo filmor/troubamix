@@ -13,23 +13,28 @@
 
   let { config }: { config: Config } = $props();
   let song: Song | null = $state(null);
+  let songs: Song[] = $state([]);
   let player: Player | undefined = $state();
   let error: string | null = $state(null);
 
   onMount(async () => {
-    if (!config.song) return;
-
     try {
+      if (!config.song) {
+        const response = await fetch(config.songsUrl);
+        if (!response.ok) throw new Error("Song folders could not be loaded");
+        songs = (await response.json()) as Song[];
+        return;
+      }
+
       const response = await fetch(
-        `${config.songsUrl}/${encodeURIComponent(config.song)}/song.json`,
+        `${config.songsUrl}/${encodeURIComponent(config.song)}`,
       );
       if (!response.ok) throw new Error("Song metadata could not be loaded");
-
       song = (await response.json()) as Song;
       player = await Player.create(
         new window.AudioContext(),
         song,
-        config.songsUrl,
+        `${config.songsUrl}/${encodeURIComponent(config.song)}/files`,
       );
     } catch {
       error = "This mix could not be loaded.";
@@ -58,11 +63,19 @@
   </div>
 {:else}
   <h1>Troubamix</h1>
-
-  <ul class="list-dics">
-    <li><a href="{config.appUrl}mix/owner">Owner</a></li>
-    <li>
-      <a href="{config.appUrl}mix/pdm">Purple Disco Machine Medley</a>
-    </li>
-  </ul>
+  {#if error}
+    <p>{error}</p>
+  {:else if songs.length > 0}
+    <ul class="list-dics">
+      {#each songs as availableSong (availableSong.id)}
+        <li>
+          <a href="{config.appUrl}mix/{encodeURIComponent(availableSong.id ?? '')}">
+            {availableSong.long_name || availableSong.folderName || availableSong.name}
+          </a>
+        </li>
+      {/each}
+    </ul>
+  {:else}
+    <p>No mixes found. Add a <code>troubamix.json</code> file to a song folder in your Nextcloud files.</p>
+  {/if}
 {/if}

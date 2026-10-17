@@ -12,8 +12,6 @@ use OCP\IRequest;
 use OCP\Util;
 
 class PageController extends Controller {
-	private const SONGS = ['owner', 'pdm'];
-
 	public function __construct(string $appName, IRequest $request) {
 		parent::__construct($appName, $request);
 	}
@@ -25,7 +23,7 @@ class PageController extends Controller {
 
 	#[NoAdminRequired]
 	public function mix(string $song): TemplateResponse|NotFoundResponse {
-		if (!in_array($song, self::SONGS, true)) {
+		if (!ctype_digit($song) || (int)$song < 1) {
 			return new NotFoundResponse();
 		}
 
@@ -39,7 +37,7 @@ class PageController extends Controller {
 		return new TemplateResponse($this->appName, 'index', [
 			'config' => [
 				'appUrl' => rtrim(Util::linkToRoute($this->appName . '.page.index'), '/') . '/',
-				'songsUrl' => rtrim(Util::linkTo($this->appName, 'static/songs'), '/'),
+				'songsUrl' => rtrim(Util::linkToRoute($this->appName . '.song.index'), '/'),
 				'song' => $song,
 			],
 		]);
