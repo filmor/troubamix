@@ -10,6 +10,6 @@ use OCP\Util;
 
 class LoadFilesScriptsListener implements IEventListener {
 	public function handle(Event $event): void {
-		Util::addScript('troubamix', 'fileactions');
+		Util::addScript('troubamix', 'troubamix');
 	}
 }
