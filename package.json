@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:nextcloud": "svelte-kit sync && vite build --config vite.nextcloud.config.ts",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
@@ -27,6 +28,9 @@
   },
   "type": "module",
   "dependencies": {
+    "@nextcloud/files": "3.12.2",
+    "@nextcloud/l10n": "3.4.1",
+    "@nextcloud/router": "3.2.0",
     "svelte-pdfjs": "^0.9.0"
   },
   "overrides": {

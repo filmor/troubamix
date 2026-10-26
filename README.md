@@ -1,38 +1,73 @@
-# create-svelte
+# Troubamix
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Troubamix is a browser-based mixer for the individual vocal tracks of a song.
+It is available as a Nextcloud app and can also be run as the original
+standalone SvelteKit site.
 
-## Creating a project
+## Requirements
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Nextcloud 28 or later
+- PHP 8.1 or later
+- A modern browser with Web Audio API support
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+To build the Nextcloud frontend, install Node.js 18 or later and pnpm.
 
-# create a new project in my-app
-npm create svelte@latest my-app
+## Install in Nextcloud
+
+1. Install the frontend dependencies and build the app assets:
+
+   ```sh
+   pnpm install --frozen-lockfile
+   pnpm run build:nextcloud
+   ```
+
+2. Copy the complete `troubamix` directory, including the generated
+   `js/troubamix.js` and `css/troubamix.css`, into Nextcloud's `apps/` directory.
+   The directory name must be `troubamix`.
+3. Enable the app from the Nextcloud app settings or run:
+
+   ```sh
+   occ app:enable troubamix
+   ```
+
+4. Open **Troubamix** from the Nextcloud app navigation to browse available
+   mixes, or open a `.tbmx` file directly in the Files app. Troubamix is the
+   default action for this file type. The action also works for song folders shared with
+   your account. Use the play, pause, and stop controls and the per-track gain
+   and pan sliders.
+
+The app has no database migrations or per-user settings. It finds song folders
+in the signed-in user's Nextcloud files by searching for `.tbmx` marker files.
+The app registers `.tbmx` as `application/x-troubamix` and makes Troubamix its
+default file action, without changing the default action for ordinary JSON
+files. Rename the marker file to end in `.tbmx` (for example, `troubamix.tbmx`).
+The marker contains the song metadata (`name`, `long_name`, and
+`tracks`, with each track containing an `id` and `name`). For example:
+
+```json
+{
+  "name": "owner",
+  "long_name": "Owner of a lonely heart",
+  "tracks": [
+    { "id": "sop", "name": "Soprano" },
+    { "id": "alto", "name": "Alto" }
+  ]
+}
 ```
 
-## Developing
+Place the matching MP3 files in the same folder, named
+`{name}-{track-id}.mp3` (for example, `owner-sop.mp3` and `owner-alto.mp3`).
+Troubamix only serves the track files declared by the marker. The app uses
+Nextcloud's file APIs and current-user permissions to discover and stream these
+files.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Development
 
-```bash
-npm run dev
+Install dependencies with `pnpm install --frozen-lockfile`. Run
+`pnpm run check` to type-check the Svelte project and
+`pnpm run build:nextcloud` to rebuild the assets loaded by Nextcloud. Copy the
+updated generated assets into your local Nextcloud app directory and reload
+Troubamix to test changes.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+The original standalone SvelteKit site remains available with `pnpm run dev`
+and `pnpm run build`.

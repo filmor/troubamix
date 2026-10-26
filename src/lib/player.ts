@@ -14,10 +14,14 @@ export class Player {
   public static async create(
     context: AudioContext,
     song: Song,
+    songFilesUrl?: string,
   ): Promise<Player> {
     const buffers: Record<string, AudioBuffer> = {};
     const promises = Object.entries(song.tracks).map(async ([id, track]) => {
-      const url = `/songs/${song.name}/${song.name}-${track.id}.mp3`;
+      const fileName = `${song.name}-${track.id}.mp3`;
+      const url = songFilesUrl
+        ? `${songFilesUrl.replace(/\/$/, "")}/${encodeURIComponent(fileName)}`
+        : `/songs/${song.name}/${fileName}`;
       const resp = await fetch(url);
       const buf = await resp.arrayBuffer();
       const decoded = await context.decodeAudioData(buf);
